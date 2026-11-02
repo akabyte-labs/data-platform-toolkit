@@ -1,0 +1,86 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-data-platform-toolkit"
+dynamic = ["version"]
+description = "MCP server for Power BI projects (PBIP, TMDL, PBIR): read, analyze and safely edit semantic models, find where measures and columns are used in reports, and trace the lineage from the SQL Server database project to the report visuals."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Matteo Rossi" }]
+keywords = ["mcp", "model-context-protocol", "power-bi", "pbip", "tmdl", "pbir", "dax", "lineage", "sql-server"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    # Model Context Protocol Python SDK (MCPServer, ex-FastMCP, + stdio Client for the optional bridge)
+    "mcp>=2.2.0,<3",
+    # T-SQL parser of the database project lineage (major version pinned: its
+    # syntax tree changes between majors)
+    "sqlglot>=30.24,<31",
+    # lineage.yaml, the lineage configuration of a database project
+    "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+# Development tools: tests and lint (see CONTRIBUTING.md).
+dev = ["pytest==8.4.2", "ruff==0.17.1"]
+
+[project.urls]
+Homepage = "https://github.com/akabyte-labs/data-platform-toolkit"
+Issues = "https://github.com/akabyte-labs/data-platform-toolkit/issues"
+Changelog = "https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CHANGELOG.md"
+
+[project.scripts]
+mcp-data-platform-toolkit = "mcp_data_platform_toolkit.server:main"
+
+[tool.hatch.version]
+path = "mcp_data_platform_toolkit/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mcp_data_platform_toolkit"]
+
+# The source archive carries what a user or a packager needs to build and
+# test the server, nothing else: no planning notes, no CI files.
+[tool.hatch.build.targets.sdist]
+only-include = [
+    "mcp_data_platform_toolkit",
+    "tests",
+    "examples",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "pyproject.toml",
+]
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = [".venv", "venv"]
+
+[tool.ruff.lint]
+# Real defects only: undefined/unused names, syntax errors, bugbear, pylint
+# errors. Style is not enforced by CI.
+select = ["F", "E9", "B", "PLE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+# 'self_test.py' is the self-contained suite (run by test_self_test_suite.py):
+# matched as '*_test.py' its functions would be collected as tests needing
+# fixtures they don't have.
+python_files = ["test_*.py"]

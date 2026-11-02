@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Made by 'uv run' in a clone: the dependencies are the ranges of pyproject.toml
+uv.lock
+
+# Local configuration / secrets
+.env
+*.local.json
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files left behind by an interrupted TMDL write
+.tmp_*.part
+
+# Local Power BI projects used for manual testing (never commit real models)
+sandbox/
+*.pbix
+
+# Working notes, never published (they name people, customers and local paths)
+Claude outputs/

@@ -1,0 +1,78 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install the package with the development tools
+        run: python -m pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check .
+
+  tests:
+    name: tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows is where the server is used (Power BI Desktop, the official
+        # bridge); Linux catches whatever depends on the platform's defaults.
+        os: [ubuntu-latest, windows-latest]
+        # Oldest and newest supported Python.
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install the package with the development tools
+        run: python -m pip install -e ".[dev]"
+      # Runs the isolated tests and the self-contained suite (self_test.py).
+      - name: Run the tests
+        run: python -m pytest
+
+  # The tests run on the source tree: this job checks what a user installs.
+  # A guide missing from the wheel, or a broken entry point, only shows here.
+  package:
+    name: package (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Build the wheel and the source archive
+        run: |
+          python -m pip install build
+          python -m build
+      - name: Check what the archives carry
+        run: python .github/scripts/check_dist.py dist
+      - name: Install the wheel in a clean environment and run it outside the repository
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/venv"
+          if [ -x "$RUNNER_TEMP/venv/Scripts/python.exe" ]; then bin="$RUNNER_TEMP/venv/Scripts"; else bin="$RUNNER_TEMP/venv/bin"; fi
+          "$bin/python" -m pip install dist/*.whl
+          cd "$RUNNER_TEMP"
+          "$bin/mcp-data-platform-toolkit" --check
+          "$bin/python" -c "from mcp_data_platform_toolkit.lineage.lineage_tools import get_lineage_config_guide; from mcp_data_platform_toolkit.semantic_model.description_guidelines import load_full_guidelines; assert get_lineage_config_guide() and load_full_guidelines(); print('The guides are read from the installed package.')"

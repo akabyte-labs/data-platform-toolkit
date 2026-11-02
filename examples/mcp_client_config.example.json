@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "data-platform-toolkit": {
+      "command": "uvx",
+      "args": ["--python", "3.13", "mcp-data-platform-toolkit"],
+      "env": {
+        "MCP_ACCESS_MODE": "read_only",
+        "MCP_MSFT_BRIDGE": "auto"
+      }
+    }
+  }
+}

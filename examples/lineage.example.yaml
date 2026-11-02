@@ -1,0 +1,37 @@
+# lineage.yaml: how a database project realizes the medallion architecture.
+# Copy it next to the .sqlproj, adapt it, then check it with test_lineage_config,
+# or let draft_lineage_config draft it from the project, asking what the SQL can't tell.
+# The full guide: lineage_config_guide.md (or the get_lineage_config_guide tool).
+
+version: 1
+
+# The layers in flow order (the first is the closest to the sources),
+# each with its schemas. A schema belongs to one layer only.
+layers:
+  bronze: raw
+  silver: [clean, curated]
+  gold: mart
+
+# Schemas without data flows: left out of the lineage.
+ignore: [config, audit]
+
+# The schema of names written without one.
+default_schema: dbo
+
+# Loads the SQL doesn't show (pipelines, generic procedures, dynamic SQL).
+# Every object whose whole 'schema.object' name matches 'match' is loaded
+# from 'from'; {group} is a named group of 'match'. The first matching rule wins.
+rules:
+  - name: history-tables
+    match: 'curated\.(?P<entity>\w+)_history'
+    from: 'curated.{entity}'
+    columns:                    # target column: source column, when they differ
+      ValidFrom: LoadedAt
+
+  - name: source-systems        # bronze tables named after their source system
+    match: 'raw\.(?P<system>[a-z]+)_(?P<table>\w+)'
+    from: '{system}.{table}'
+    external: true              # the source is outside the project
+
+# Columns created by the ETL itself: surrogate keys, hashes, load dates.
+technical_columns: ['etl_\w+', '\w+_sk', 'row_hash']
