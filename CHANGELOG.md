@@ -4,6 +4,9 @@ All notable changes to this project. The version is the one the server
 declares to MCP clients and the version of the package
 (`mcp_data_platform_toolkit/__init__.py`, `__version__`).
 
+Versions before 1.5.0 were developed in a private repository: their history
+and tags are not part of this one.
+
 ## Unreleased
 
 The lineage no longer shows an empty picture of a warehouse whose schemas are
