@@ -7,93 +7,15 @@ declares to MCP clients and the version of the package
 Versions before 1.5.0 were developed in a private repository: their history
 and tags are not part of this one.
 
-## Unreleased
-
-The lineage no longer shows an empty picture of a warehouse whose schemas are
-not called bronze, silver and gold, and no longer stops in silence at the files
-a pipeline writes.
-
-### Added
-
-- **The structure of a project with no configuration.** When
-  `get_sql_project_lineage`, `get_end_to_end_lineage` or `export_lineage` meet a
-  database project with no `lineage.yaml` (or a file of the user's that says
-  nothing) and the standard layers place less than half of its objects, they
-  infer its structure from the SQL (the layers in flow order, the schemas to
-  leave out, the rules, the ETL columns; with the model, the schemas it reads
-  are the last layer), show it in a form of the client and ask: save it, change
-  it or not now. On *save* it is written as the user's own configuration, in
-  their folder, outside the repository, also in read-only mode (the answer
-  doesn't go through the language model). The repository's own file is never
-  replaced. A client that can't show forms gets the proposal through the
-  assistant, once. With *not now*, or a declined form, the lineage uses the
-  structure for the session, and every response says
-  `PROVISIONAL, not saved`.
-- **Files written by a pipeline.** `test_lineage_config` flags the objects that
-  only read files nothing in the project writes when another object is named
-  like them (a Parquet exported from `etl.vw_fact_x` and read by `dwh.fact_x`
-  through `OPENROWSET`): the lineage stopped at the file and the check said
-  "Nothing to fix". `suggest_lineage_rules` and `draft_lineage_config` propose
-  the rule that connects them. A file people drop (a CSV of targets) has no such
-  object and stays the source.
-- Every lineage response warns when the layers of the configuration in use
-  place less than half of the project's objects.
-
-- **`get_documentation_coverage`.** How much of the model has a `///`
-  description, for the whole model or one table: measures, columns and
-  tables / hierarchies / calculation items, the visible ones apart from the
-  hidden ones, then the tables with the most undocumented visible elements (the
-  names of a table's, with `table_name`). Until now the assistant could only
-  estimate from a few tables. A test keeps its figures equal to those of
-  `get_table_summary`.
-- **The server tells its assistant what to say** when a client connects
-  (`SERVER_INSTRUCTIONS`): answer from the tools and don't rebuild a lineage by
-  hand; say what they report they did not cover; say when a lineage is
-  provisional; write descriptions only from what the model supports.
-- **Descriptions say only what the model supports.** The built-in guidelines
-  have a GROUNDING section (no business agreements, thresholds or causes that no
-  file shows, company terms explained only if defined, the facts of an existing
-  description kept, what was inferred listed); the short text of the tools says
-  it; the preview repeats it, and warns when `overwrite` would replace an
-  existing description. The files of your rules invite a glossary.
-
-### Changed
-
-- The README is a first screen: what the server does, a lineage diagram, a command to
-  try it, and links. The reference moved to `docs/` (installation, configuration,
-  tools, lineage, known limitations, development); each page is organised by what
-  the reader is looking for, and the Mermaid diagram of the lineage is kept equal to
-  the export by a test in both the README and `docs/lineage.md`.
-- The documentation was edited for readability: `docs/configuration.md` explains
-  your folder, the description rules and the lineage configuration once each
-  (they were described twice); the long tool descriptions in `docs/tools.md` and
-  the lineage configuration steps in `docs/lineage.md` are split into short lists.
-- The README explains how the server fits with Microsoft's Power BI Modeling MCP
-  Server (a short comparison, and the bridge that uses part of it) instead of
-  presenting it as an alternative. Its lineage diagram drops the edge labels and
-  breaks long names on two lines, so it stays readable in GitHub's column;
-  `docs/lineage.md` draws the full diagram top to bottom. A test checks both
-  against the export.
-- The package metadata (`pyproject.toml`) points to the same repository as the
-  README, `akabyte-labs/data-platform-toolkit`.
-- The end-to-end lineage and the exports flag the reports they leave out
-  (PBIR-Legacy, no definition) on a line of their own at the top, `[!] N
-  report(s) NOT analyzed`, and the `Coverage` line counts them; before, they
-  were the tail of the line of the reports analyzed. Reports of another model
-  are listed apart: they are not a gap.
-- The rules suggested for a table never take as its source an object that reads
-  it, directly or through others.
-- Comparing the names of hundreds of tables with the objects of the project is
-  several times faster (`difflib` instead of a table of lengths in Python, with
-  the same results): about 2 seconds instead of 10 on 660 objects.
-- `elicitation_supported` answers "no" outside a request (a tool called without
-  a client) instead of raising.
-
 ## 1.5.0
 
 The server becomes Data Platform Toolkit, an installable package, and the
 files that belong to the user (the rules for the descriptions, the lineage
 configurations) move to a folder of their own, outside the projects.
+
+It also infers the structure of a warehouse whose schemas are not called
+bronze, silver and gold, instead of showing an empty lineage, and follows the
+files a pipeline writes instead of stopping at them in silence.
 
 ### Added
 
@@ -157,6 +79,46 @@ configurations) move to a folder of their own, outside the projects.
   matching nothing, tables nothing loads, flows going backwards). Opening
   the editor doesn't wait for it, and is skipped where there is no
   graphical session.
+- **The structure of a project with no configuration.** When
+  `get_sql_project_lineage`, `get_end_to_end_lineage` or `export_lineage` meet a
+  database project with no `lineage.yaml` (or a file of the user's that says
+  nothing) and the standard layers place less than half of its objects, they
+  infer its structure from the SQL (the layers in flow order, the schemas to
+  leave out, the rules, the ETL columns; with the model, the schemas it reads
+  are the last layer), show it in a form of the client and ask: save it, change
+  it or not now. On *save* it is written as the user's own configuration, in
+  their folder, outside the repository, also in read-only mode (the answer
+  doesn't go through the language model). The repository's own file is never
+  replaced. A client that can't show forms gets the proposal through the
+  assistant, once. With *not now*, or a declined form, the lineage uses the
+  structure for the session, and every response says
+  `PROVISIONAL, not saved`.
+- **Files written by a pipeline.** `test_lineage_config` flags the objects that
+  only read files nothing in the project writes when another object is named
+  like them (a Parquet exported from `etl.vw_fact_x` and read by `dwh.fact_x`
+  through `OPENROWSET`): the lineage stopped at the file and the check said
+  "Nothing to fix". `suggest_lineage_rules` and `draft_lineage_config` propose
+  the rule that connects them. A file people drop (a CSV of targets) has no such
+  object and stays the source.
+- Every lineage response warns when the layers of the configuration in use
+  place less than half of the project's objects.
+- **`get_documentation_coverage`.** How much of the model has a `///`
+  description, for the whole model or one table: measures, columns and
+  tables / hierarchies / calculation items, the visible ones apart from the
+  hidden ones, then the tables with the most undocumented visible elements (the
+  names of a table's, with `table_name`). Until now the assistant could only
+  estimate from a few tables. A test keeps its figures equal to those of
+  `get_table_summary`.
+- **The server tells its assistant what to say** when a client connects
+  (`SERVER_INSTRUCTIONS`): answer from the tools and don't rebuild a lineage by
+  hand; say what they report they did not cover; say when a lineage is
+  provisional; write descriptions only from what the model supports.
+- **Descriptions say only what the model supports.** The built-in guidelines
+  have a GROUNDING section (no business agreements, thresholds or causes that no
+  file shows, company terms explained only if defined, the facts of an existing
+  description kept, what was inferred listed); the short text of the tools says
+  it; the preview repeats it, and warns when `overwrite` would replace an
+  existing description. The files of your rules invite a glossary.
 
 ### Fixed in the draft of the lineage configuration
 
@@ -207,6 +169,35 @@ configurations) move to a folder of their own, outside the projects.
   introduces itself to MCP clients as "Data Platform Toolkit".
 - The dependencies are declared in `pyproject.toml`: `requirements.txt` and
   `requirements-dev.txt` are gone (`pip install -e ".[dev]"` from a clone).
+- The README is a first screen: what the server does, a lineage diagram, a command to
+  try it, and links. The reference moved to `docs/` (installation, configuration,
+  tools, lineage, known limitations, development); each page is organised by what
+  the reader is looking for, and the Mermaid diagram of the lineage is kept equal to
+  the export by a test in both the README and `docs/lineage.md`.
+- The documentation was edited for readability: `docs/configuration.md` explains
+  your folder, the description rules and the lineage configuration once each
+  (they were described twice); the long tool descriptions in `docs/tools.md` and
+  the lineage configuration steps in `docs/lineage.md` are split into short lists.
+- The README explains how the server fits with Microsoft's Power BI Modeling MCP
+  Server (a short comparison, and the bridge that uses part of it) instead of
+  presenting it as an alternative. Its lineage diagram drops the edge labels and
+  breaks long names on two lines, so it stays readable in GitHub's column;
+  `docs/lineage.md` draws the full diagram top to bottom. A test checks both
+  against the export.
+- The package metadata (`pyproject.toml`) points to the same repository as the
+  README, `akabyte-labs/data-platform-toolkit`.
+- The end-to-end lineage and the exports flag the reports they leave out
+  (PBIR-Legacy, no definition) on a line of their own at the top, `[!] N
+  report(s) NOT analyzed`, and the `Coverage` line counts them; before, they
+  were the tail of the line of the reports analyzed. Reports of another model
+  are listed apart: they are not a gap.
+- The rules suggested for a table never take as its source an object that reads
+  it, directly or through others.
+- Comparing the names of hundreds of tables with the objects of the project is
+  several times faster (`difflib` instead of a table of lengths in Python, with
+  the same results): about 2 seconds instead of 10 on 660 objects.
+- `elicitation_supported` answers "no" outside a request (a tool called without
+  a client) instead of raising.
 
 ### Upgrading from 1.4.0
 
