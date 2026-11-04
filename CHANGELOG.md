@@ -7,6 +7,26 @@ declares to MCP clients and the version of the package
 Versions before 1.5.0 were developed in a private repository: their history
 and tags are not part of this one.
 
+## 1.5.1
+
+A documentation release: the description on PyPI now shows what the README
+shows on GitHub. The server itself does not change.
+
+### Changed
+
+- **README**: every link is absolute, so it also works on the PyPI page, and
+  the lineage example is an image (`docs/img/lineage-example.png`), because
+  PyPI does not render Mermaid. Its source is `docs/img/lineage-example.mmd`,
+  which the tests still compare with the real export.
+- **README**: new "How it was built" section; the licence and trademark line
+  at the end is gone (the licence is in `LICENSE`).
+
+### Added
+
+- Issue templates for bug reports and feature requests, with a link to the
+  private vulnerability report, and a pull request template.
+- Dependabot configuration for the pip dependencies and the GitHub Actions.
+
 ## 1.5.0
 
 The server becomes Data Platform Toolkit, an installable package, and the

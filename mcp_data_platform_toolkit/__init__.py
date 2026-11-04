@@ -11,4 +11,4 @@ checks the interpreter version, and this module is imported before it.
 
 # Declared to MCP clients in the handshake, printed by --check, and read by
 # the build as the package version.
-__version__ = "1.5.0"
+__version__ = "1.5.1"
