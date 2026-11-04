@@ -208,8 +208,10 @@ def test_save_is_a_full_access_tool():
 def test_the_readme_example_is_the_real_export(shop):
     """
     The lineage example of the README and of docs/lineage.md is this export: a change of the output must update
-    both. docs/lineage.md draws it top to bottom (`flowchart TB`) so it fits GitHub's column; the README keeps it
-    left to right but drops the edge labels and breaks long names on two lines, so it stays readable when shrunk.
+    both. docs/lineage.md draws it top to bottom (`flowchart TB`) so it fits GitHub's column. The README shows it as
+    an image, because PyPI does not render Mermaid: docs/img/lineage-example.png is rendered from
+    docs/img/lineage-example.mmd, which keeps it left to right but drops the edge labels and breaks long names on
+    two lines, so it stays readable when shrunk. Regenerate the PNG whenever the .mmd changes.
     """
     import re
 
@@ -229,6 +231,9 @@ def test_the_readme_example_is_the_real_export(shop):
 
     lineage_page = shown("docs", "lineage.md")
     assert lineage_page.startswith("flowchart TB\n") and lineage_page.strip().partition("\n")[2] == body
-    readme = shown("README.md")
+    with open(os.path.join(root, "docs", "img", "lineage-example.mmd"), encoding="utf-8") as handle:
+        readme = handle.read()
     assert readme.startswith("flowchart LR\n")
     assert squeezed(readme.partition("\n")[2]) == squeezed(re.sub(r"-->\|[^|]*\| ", "--> ", body))
+    with open(os.path.join(root, "README.md"), encoding="utf-8") as handle:
+        assert "/main/docs/img/lineage-example.png" in handle.read()

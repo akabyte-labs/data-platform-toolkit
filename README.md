@@ -12,48 +12,7 @@ An MCP (Model Context Protocol) server for Power BI projects saved as PBIP. It r
 
 Asked where the *Ratio* card of a synthetic test project gets its numbers from, the server follows it back to the files the data warehouse loads ([the full example](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/lineage.md#example-where-the-number-of-a-visual-comes-from)):
 
-```mermaid
-flowchart LR
-  subgraph L0["source"]
-    n0["file:sales/<br/>orders/<br/>(Price)"]
-    n1["file:sales/<br/>orders/<br/>(Qty)"]
-    n2["file:targets/<br/>*.csv<br/>(Target)"]
-  end
-  subgraph L1["bronze"]
-    n3["raw.orders<br/>.Price"]
-    n4["raw.orders<br/>.Qty"]
-  end
-  subgraph L2["silver"]
-    n5["core.sales<br/>.Amount"]
-  end
-  subgraph L3["gold"]
-    n6["mart.sales<br/>.Amount"]
-    n7["mart.targets<br/>.Target"]
-  end
-  subgraph L4["semantic<br/>model"]
-    n8["[Ratio]"]
-    n9["[Stretch<br/>Total]"]
-    n10["[Total<br/>Sales]"]
-    n11["Sales<br/>[Sales<br/>Amount]"]
-    n12["Targets<br/>[Stretch]"]
-  end
-  subgraph L5["report"]
-    n13["Shop /<br/>Overview /<br/>'Ratio'<br/>(card)"]
-  end
-  n0 --> n3
-  n1 --> n4
-  n2 --> n7
-  n3 --> n5
-  n4 --> n5
-  n5 --> n6
-  n6 --> n11
-  n7 --> n12
-  n8 --> n13
-  n9 --> n8
-  n10 --> n8
-  n11 --> n10
-  n12 --> n9
-```
+[![Lineage of the Ratio card, from the source files through the bronze, silver and gold layers and the semantic model to the report visual](https://raw.githubusercontent.com/akabyte-labs/data-platform-toolkit/main/docs/img/lineage-example.png)](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/lineage.md#example-where-the-number-of-a-visual-comes-from)
 
 ## Try it
 
@@ -86,6 +45,10 @@ Microsoft's [Power BI Modeling MCP Server](https://github.com/microsoft/powerbi-
 
 You don't have to choose. If the official server is installed, this server's optional [bridge](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/tools.md#the-microsoft-bridge) gives the assistant its modeling tools on the local PBIP folder, from the same connection. Everything else of the official server, such as DAX queries, refresh and cloud operations, stays with it.
 
+## How it was built
+
+I designed the tool, wrote the specifications and reviewed every change; most of the code was written with Claude Code as a pair programmer. A test suite that builds synthetic PBIP and database projects checks every change, on Windows and Linux.
+
 ## Documentation
 
 - [Installation and client setup](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/installation.md)
@@ -95,5 +58,3 @@ You don't have to choose. If the official server is installed, this server's opt
 - [Known limitations](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/limitations.md)
 - [Development: project structure and tests](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/development.md)
 - [Changelog](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CHANGELOG.md) · [Contributing](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CONTRIBUTING.md) · [Code of Conduct](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CODE_OF_CONDUCT.md) · [Security](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/SECURITY.md)
-
-Released under the [MIT License](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/LICENSE). Not affiliated with or endorsed by Microsoft. Power BI and Microsoft Fabric are trademarks of Microsoft Corporation.

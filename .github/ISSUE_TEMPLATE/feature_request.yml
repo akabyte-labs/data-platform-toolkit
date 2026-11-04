@@ -1,0 +1,21 @@
+name: Feature request
+description: A question the server cannot answer yet, or a tool it should have
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: ask
+    attributes:
+      label: What you would like to ask
+      description: The request you would make to the assistant, in your own words.
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: What happens today
+      description: What the server answers now, or why the current tools are not enough.
+  - type: textarea
+    id: context
+    attributes:
+      label: Project context
+      description: The parts of the project involved (semantic model, PBIR reports, database project, lineage.yaml).
