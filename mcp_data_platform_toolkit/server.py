@@ -133,12 +133,13 @@ def run_check(project_path: str = "") -> int:
     # copy-pasted line, and the very first contact with the tool would already
     # have write permissions on the model.
     #
-    # Two of them: with uvx, which installs and updates the server by itself,
-    # and with the interpreter running this check. Under uvx that interpreter
-    # lives in uv's cache and can disappear, so neither one alone is right
-    # for everybody.
+    # Two of them: with uvx, which installs the server by itself but keeps
+    # the version in its cache (a new release needs '@latest'), and with the
+    # interpreter running this check. Under uvx that interpreter lives in
+    # uv's cache and can disappear, so neither one alone is right for
+    # everybody.
     for title, command, args in (
-            ("With uvx (installs and updates the server by itself):",
+            (f"With uvx (installs the server by itself; update it with {DISTRIBUTION}@latest):",
              "uvx", ["--python", UVX_PYTHON, DISTRIBUTION, "--access=read_only"]),
             ("Or with this Python environment, where the server is installed now:",
              sys.executable, ["-m", "mcp_data_platform_toolkit", "--access=read_only"])):

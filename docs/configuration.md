@@ -12,7 +12,7 @@
 | Environment variable | CLI flag | Values | Default | Description |
 |---|---|---|---|---|
 | `MCP_ACCESS_MODE` | `--access=` | `read_only`, `full_access` | `read_only` | Write tools are registered only in `full_access` mode. `--access=` takes precedence over the variable. |
-| `MCP_MSFT_BRIDGE` | `--msft-bridge=` | `auto`, `on`, `off` | `auto` | `auto` enables the bridge only if the official executable is found. |
+| `MCP_MSFT_BRIDGE` | `--msft-bridge=` | `auto`, `on`, `off` | `auto` | `auto` enables the [bridge](tools.md#the-microsoft-bridge) only if the official executable is found (otherwise only `list_official_powerbi_tools` is registered, to explain how to install it); `on` registers it anyway; `off` registers none of its tools. `--msft-bridge=` takes precedence over the variable. |
 | `MCP_MAX_OUTPUT_CHARS` | | characters | `20000` | Character budget for the tools' text responses. |
 | `MCP_MAX_CACHED_CHARS` | | characters | `4000000` | Size cap of the cache that keeps full bridge results for `get_official_result_detail`. |
 | `MCP_ALLOWED_ROOTS` | | folders | | Folders the server may read or write, separated by `;` on Windows and `:` elsewhere. See [Allowed folders](#allowed-folders). |
@@ -21,7 +21,7 @@
 | `POWERBI_MODELING_MCP_TIMEOUT` | | seconds | `120` | Timeout for each call to the official server. |
 | `POWERBI_MODELING_MCP_MAX_CHARS` | | characters | `4000` | Character budget for bridge responses before they are reduced. |
 
-> **Tip:** start in `read_only` mode and switch to `full_access` only when you want the assistant to edit files. Keep your project under version control so you can review every change.
+> **Tip:** start in `read_only` mode and switch to `full_access` only when you want the assistant to edit files ([how](installation.md#enable-the-write-tools)). Keep your project under version control so you can review every change.
 
 ### Allowed folders
 
@@ -38,7 +38,7 @@ Your folder is always allowed.
 
 Your own files (your description rules and your lineage configurations) live in a folder outside the projects' repositories. A project folder is often a customer's repository, and a personal file must never end up there by mistake. Updating the server never touches this folder.
 
-By default it is `%APPDATA%\data-platform-toolkit` on Windows and `~/.config/data-platform-toolkit` on macOS and Linux:
+By default it is `%APPDATA%\data-platform-toolkit` on Windows and `~/.config/data-platform-toolkit` on macOS and Linux (`$XDG_CONFIG_HOME/data-platform-toolkit` when that variable is set):
 
 ```
 %APPDATA%\data-platform-toolkit\
@@ -81,7 +81,10 @@ Your rules and your lineage configurations always move together with the folder:
 
 ### Sharing with the team
 
-The server writes in a project's repository only when you ask it to (`scope='repo'`). A file the team committed there takes precedence over yours, and the server tells you when yours is not used.
+The server writes in a project's repository only when you ask it to (`scope='repo'`). A file the team committed there is read together with yours, in two different ways:
+
+- the team's **description rules** add to yours ([order](#where-they-come-from));
+- the team's **lineage configuration** replaces yours ([order](#which-file-is-used)).
 
 ## Description rules
 
@@ -127,8 +130,18 @@ To open it in the system's editor:
 uvx --python 3.13 mcp-data-platform-toolkit --lineage-config "C:\path\to\Project.sqlproj"
 ```
 
-It opens `projects\<repository>\<database project>.lineage.yaml` in your folder. The server needs the `.sqlproj` to name the file and, when there is no configuration yet, to draft one from the project. A draft comes with a warning: check it before relying on it, because a wrong layer or a schema ignored by mistake makes the whole lineage wrong without any error. Review it yourself or ask the assistant to complete it.
+It opens `projects\<repository>\<database project>.lineage.yaml` in your folder. The server needs the `.sqlproj` to name the file and, when there is no configuration yet, to draft one from the project.
 
-If the database project's repository has its own `lineage.yaml`, shared with the team, that one takes precedence, and the command opens it instead and tells you so.
+A draft comes with a warning: check it before relying on it. A wrong layer or a schema ignored by mistake makes the whole lineage wrong without any error. Review it yourself or ask the assistant to complete it.
+
+### Which file is used
+
+The server looks for the configuration of a database project in this order, and uses the first one it finds:
+
+1. `config_path`, when a tool is given one;
+2. the repository's `lineage.yaml` (or `lineage.yml`) next to the `.sqlproj`, if the team committed one;
+3. yours: `projects\<repository>\<database project>.lineage.yaml` in [your folder](#your-folder).
+
+Every lineage response says which file it used, and says so when the repository's file hides yours; `--lineage-config` then opens the repository's file and tells you. Without any file, the standard medallion applies: schemas `bronze`, `silver` and `gold`.
 
 How to write the configuration: [lineage.md](lineage.md#database-lineage-configuration).

@@ -6,6 +6,8 @@ In short: be respectful and constructive, welcome people of every background and
 
 ## Reporting
 
-If you experience or witness unacceptable behavior, contact the maintainer privately through the contact options on the maintainer's GitHub profile. Reports are handled confidentially.
+If you experience or witness unacceptable behavior, open a [private contact request](https://github.com/akabyte-labs/data-platform-toolkit/issues/new?template=private_contact.yml), with no names or details: the issue is public. The maintainer will reply with a private way to send the report. Reports are handled confidentially.
+
+For security problems, use the private report described in [SECURITY.md](SECURITY.md) instead.
 
 Maintainers may remove, edit or reject comments, commits, code, issues and other contributions that do not follow this Code of Conduct, and may temporarily or permanently ban contributors for behavior they deem harmful.

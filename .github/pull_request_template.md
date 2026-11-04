@@ -6,5 +6,5 @@
 
 - [ ] `python -m pytest` passes
 - [ ] `ruff check .` passes
-- [ ] New behaviour is covered by a test, using synthetic or anonymized files only
-- [ ] `CHANGELOG.md` and the docs are updated where the behaviour changes
+- [ ] New behavior is covered by a test, using synthetic or anonymized files only
+- [ ] `CHANGELOG.md` and the docs are updated where the behavior changes

@@ -1,14 +1,18 @@
 # Data Platform Toolkit
 
+[![tests](https://github.com/akabyte-labs/data-platform-toolkit/actions/workflows/tests.yml/badge.svg)](https://github.com/akabyte-labs/data-platform-toolkit/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/mcp-data-platform-toolkit)](https://pypi.org/project/mcp-data-platform-toolkit/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/LICENSE)
+
 **Ask your AI assistant where a Power BI number comes from, and get the answer down to the source column.**
 
 An MCP (Model Context Protocol) server for Power BI projects saved as PBIP. It reads the files on disk, with no connection to Power BI Desktop, the Power BI service or Microsoft Fabric, and lets an AI assistant:
 
-- **analyse and safely edit semantic models** in TMDL format (read-only by default);
+- **analyze and safely edit semantic models** in TMDL format (read-only by default);
 - **find where measures and columns are used** in PBIR reports, and which security roles read them;
 - **trace end-to-end lineage**: from the source column of a SQL Server database project, through its medallion layers and Power Query, to the measures and the report visuals.
 
-[![tests](https://github.com/akabyte-labs/data-platform-toolkit/actions/workflows/tests.yml/badge.svg)](https://github.com/akabyte-labs/data-platform-toolkit/actions/workflows/tests.yml)
+**Scope:** Power BI projects saved as PBIP, with the semantic model in TMDL and the reports in PBIR (not `.pbix` files); on the database side, SQL Server database projects (`.sqlproj`, T-SQL). Other sources that Power Query reads (files, other databases, services) appear as the start of the lineage, with their connector.
 
 Asked where the *Ratio* card of a synthetic test project gets its numbers from, the server follows it back to the files the data warehouse loads ([the full example](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/lineage.md#example-where-the-number-of-a-visual-comes-from)):
 
@@ -16,11 +20,13 @@ Asked where the *Ratio* card of a synthetic test project gets its numbers from, 
 
 ## Try it
 
+With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed, nothing else to install by hand:
+
 ```bash
 uvx --python 3.13 mcp-data-platform-toolkit --check "C:\path\to\Project.pbip"
 ```
 
-`--check` validates the project and prints a ready-to-paste configuration for your MCP client. Full setup: [docs/installation.md](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/installation.md).
+`--check` validates the project and prints the configuration to paste into your MCP client, in read-only mode. Then ask the assistant about the project. Setup for Claude Desktop, VS Code and Claude Code, or with pip: [docs/installation.md](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/installation.md).
 
 ## What you can ask
 
@@ -28,7 +34,7 @@ uvx --python 3.13 mcp-data-platform-toolkit --check "C:\path\to\Project.pbip"
 | --- | --- |
 | "Where is [Total Sales] used, and does any RLS role read it?" | Searches every PBIR report and the RLS filters |
 | "Which source columns does [Gross Margin %] come from?" | Follows DAX, Power Query and the T-SQL of the database project, upstream |
-| "If I drop mart.sales.Discount, what breaks?" | The same chain, downstream, down to the visuals |
+| "If I drop `mart.sales.Discount`, what breaks?" | The same chain, downstream, down to the visuals |
 | "Draft the lineage.yaml of this database project." | Reads the project and asks only what the SQL can't tell |
 
 More requests, with the tools behind each one: [docs/tools.md](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/tools.md#what-you-can-ask).
@@ -43,11 +49,13 @@ Microsoft's [Power BI Modeling MCP Server](https://github.com/microsoft/powerbi-
 | **Answers** | what the model contains, and DAX queries | where each field is used, who can see it, where its data comes from |
 | **Edits** | the whole model | measures, calculation items, formats, folders, visibility, descriptions and OLS, written straight into the TMDL files; the rest of the model through the [bridge](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/tools.md#the-microsoft-bridge) |
 
-You don't have to choose. If the official server is installed, this server's optional [bridge](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/tools.md#the-microsoft-bridge) gives the assistant its modeling tools on the local PBIP folder, from the same connection. Everything else of the official server, such as DAX queries, refresh and cloud operations, stays with it.
+You don't have to choose. If the official server is installed, this server's optional [bridge](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/tools.md#the-microsoft-bridge) gives the assistant its modeling tools on the local PBIP folder, from the same connection (Windows only). Everything else of the official server, such as DAX queries, refresh and cloud operations, stays with it.
 
 ## How it was built
 
-I designed the tool, wrote the specifications and reviewed every change; most of the code was written with Claude Code as a pair programmer. A test suite that builds synthetic PBIP and database projects checks every change, on Windows and Linux.
+The model and report tools started on a real Power BI project, where the end-to-end lineage was first built for one data warehouse. This version makes the lineage generic, so any naming convention can be described in `lineage.yaml`.
+
+I designed the tool, wrote the specifications and reviewed every change; most of the code was written with Claude Code as a pair programmer. A test suite that builds synthetic PBIP and database projects checks every change, on Windows and Linux. The choices behind it, and why: [design decisions](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/design.md).
 
 ## Documentation
 
@@ -56,5 +64,6 @@ I designed the tool, wrote the specifications and reviewed every change; most of
 - [End-to-end lineage and lineage.yaml](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/lineage.md)
 - [Configuration and options](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/configuration.md)
 - [Known limitations](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/limitations.md)
+- [Design decisions](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/design.md)
 - [Development: project structure and tests](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/development.md)
 - [Changelog](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CHANGELOG.md) · [Contributing](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CONTRIBUTING.md) · [Code of Conduct](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CODE_OF_CONDUCT.md) · [Security](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/SECURITY.md)
