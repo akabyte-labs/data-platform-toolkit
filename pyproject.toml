@@ -36,7 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Development tools: tests and lint (see CONTRIBUTING.md).
-dev = ["pytest==8.4.2", "ruff==0.17.3"]
+dev = ["pytest==9.2.0", "ruff==0.17.3"]
 
 [project.urls]
 Homepage = "https://github.com/akabyte-labs/data-platform-toolkit"
