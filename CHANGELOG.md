@@ -7,10 +7,10 @@ declares to MCP clients and the version of the package
 Versions before 1.5.0 were developed in a private repository: their history
 and tags are not part of this one.
 
-## 1.5.1
+## Unreleased
 
-A documentation release: the description on PyPI now shows what the README
-shows on GitHub. The server itself does not change.
+Documentation only: the description on PyPI will show what the README shows
+on GitHub. The server itself does not change.
 
 ### Changed
 
