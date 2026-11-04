@@ -45,6 +45,10 @@ Microsoft's [Power BI Modeling MCP Server](https://github.com/microsoft/powerbi-
 
 You don't have to choose. If the official server is installed, this server's optional [bridge](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/tools.md#the-microsoft-bridge) gives the assistant its modeling tools on the local PBIP folder, from the same connection. Everything else of the official server, such as DAX queries, refresh and cloud operations, stays with it.
 
+## How it was built
+
+I designed the tool, wrote the specifications and reviewed every change; most of the code was written with Claude Code as a pair programmer. A test suite that builds synthetic PBIP and database projects checks every change, on Windows and Linux.
+
 ## Documentation
 
 - [Installation and client setup](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/installation.md)
