@@ -58,5 +58,3 @@ I designed the tool, wrote the specifications and reviewed every change; most of
 - [Known limitations](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/limitations.md)
 - [Development: project structure and tests](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/docs/development.md)
 - [Changelog](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CHANGELOG.md) · [Contributing](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CONTRIBUTING.md) · [Code of Conduct](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/CODE_OF_CONDUCT.md) · [Security](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/SECURITY.md)
-
-Released under the [MIT License](https://github.com/akabyte-labs/data-platform-toolkit/blob/main/LICENSE). Not affiliated with or endorsed by Microsoft. Power BI and Microsoft Fabric are trademarks of Microsoft Corporation.
