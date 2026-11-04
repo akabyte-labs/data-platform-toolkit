@@ -9,8 +9,15 @@ and tags are not part of this one.
 
 ## Unreleased
 
-Documentation only: the description on PyPI will show what the README shows
-on GitHub. The server itself does not change.
+Mostly documentation: the description on PyPI will show what the README
+shows on GitHub, and the docs are corrected where they disagreed with the
+server. The only change to the server is one line printed by `--check`.
+
+### Fixed
+
+- `--check` said that uvx updates the server by itself: uvx keeps the
+  version in its cache, so the line now says to update with
+  `mcp-data-platform-toolkit@latest`.
 
 ### Changed
 
@@ -18,13 +25,51 @@ on GitHub. The server itself does not change.
   the lineage example is an image (`docs/img/lineage-example.png`), because
   PyPI does not render Mermaid. Its source is `docs/img/lineage-example.mmd`,
   which the tests still compare with the real export.
-- **README**: new "How it was built" section; the licence and trademark line
-  at the end is gone (the licence is in `LICENSE`).
+- **README**: new "How it was built" section; the license and trademark line
+  at the end is gone (the license is in `LICENSE`). The badges (tests, PyPI,
+  license) are under the title, and "Try it" says uv is needed and what to do
+  with the configuration `--check` prints.
+- **Installation**: a VS Code example of its own (`"type": "stdio"`), how to
+  enable the write tools (the `--access=` flag in a configuration copied from
+  `--check` takes precedence over `MCP_ACCESS_MODE`), and how to update a
+  server run by uvx (`mcp-data-platform-toolkit@latest`), which keeps the
+  version in its cache otherwise.
+- **Docs corrected where they disagreed with the server**: a repository's
+  `description_guidelines.md` adds to your rules and your rules for the
+  project win, while a repository's `lineage.yaml` replaces yours (the two
+  were described as the same); `list_official_powerbi_tools` is not
+  registered with `MCP_MSFT_BRIDGE=off`; a reduced response can lose
+  elements, and says so; the rules given to the assistant are listed in
+  full; `SECURITY.md` lists everything written in read-only mode.
+- **Docs completed**: the arguments shared by the lineage tools
+  (`config_path`, `reports_path`, `output_format`, `export_format` and the
+  defaults), `search_in`, `perspective_name`, the options of
+  `create_measure`, where the bridge looks for the official executable, the
+  files missing from the project structure, and the lineage.md section on
+  files written by a pipeline in its contents.
+- **README**: a "Scope" line (PBIP with TMDL and PBIR, SQL Server database
+  projects), and "How it was built" says the tools started on a real
+  Power BI project.
+- **Installation**: Python 3.10 to 3.13, as CI tests them (it said "3.10 or
+  later"), how to save a `.pbix` as a PBIP project with TMDL and PBIR.
+- **Limitations**: Power BI Desktop can reload files changed outside it with
+  a preview feature, and saving a PBIR-Legacy report in a recent release
+  converts it.
+- **One place for each fact**: which lineage configuration is used is
+  described in `configuration.md` only, and the other pages link to it.
+  `SECURITY.md` and the long rows of the tool tables are split into short
+  sections. American spelling throughout.
+- **Code of Conduct**: a conduct problem is reported by asking for a private
+  channel through an issue template.
 
 ### Added
 
+- `docs/design.md`: the design decisions and the reasons behind them.
+- **Installation**: a Troubleshooting section, with the messages the server
+  gives and what to do.
 - Issue templates for bug reports and feature requests, with a link to the
-  private vulnerability report, and a pull request template.
+  private vulnerability report, a template to ask for a private contact,
+  and a pull request template.
 - Dependabot configuration for the pip dependencies and the GitHub Actions.
 
 ## 1.5.0
@@ -191,7 +236,7 @@ files a pipeline writes instead of stopping at them in silence.
   `requirements-dev.txt` are gone (`pip install -e ".[dev]"` from a clone).
 - The README is a first screen: what the server does, a lineage diagram, a command to
   try it, and links. The reference moved to `docs/` (installation, configuration,
-  tools, lineage, known limitations, development); each page is organised by what
+  tools, lineage, known limitations, development); each page is organized by what
   the reader is looking for, and the Mermaid diagram of the lineage is kept equal to
   the export by a test in both the README and `docs/lineage.md`.
 - The documentation was edited for readability: `docs/configuration.md` explains

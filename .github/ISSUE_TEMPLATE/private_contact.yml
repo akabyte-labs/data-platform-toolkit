@@ -1,0 +1,16 @@
+name: Private contact request
+description: Ask the maintainer for a private channel, for example to report a Code of Conduct problem
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is public: write no names and no details here.
+        The maintainer will reply with a private way to send them.
+        For security problems, use the private report in the Security tab instead.
+  - type: checkboxes
+    id: request
+    attributes:
+      label: Request
+      options:
+        - label: I would like a private channel to report a Code of Conduct problem.
+          required: true

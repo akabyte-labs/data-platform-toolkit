@@ -6,6 +6,8 @@
 
 ```
 mcp_data_platform_toolkit/          the package
+  __init__.py                       the version (read by the build, declared to clients)
+  __main__.py                       python -m mcp_data_platform_toolkit
   server.py                         entry point (access mode, bridge, tool registration, --check)
   rules_cli.py                      the --guidelines, --lineage-config and --user-folder commands
   mcp_common/                       shared error handling, output reduction, the user's folder
@@ -42,6 +44,7 @@ mcp_data_platform_toolkit/          the package
     end_to_end.py                   the three parts joined, the checks, the targets
     suggestions.py, export.py       rules inferred from the names, Mermaid / Markdown / CSV / JSON
     config_draft.py                 a first lineage.yaml drafted from the project, and its questions
+    draft_notice.py, config_review.py   what marks a generated file as a draft, and the form that shows its warning
     structure.py                    the structure proposed for a project with no configuration: the form, and the save
     lineage_config_guide.md         the guide to write lineage.yaml
     lineage_tools.py                the MCP tools
@@ -50,8 +53,12 @@ tests/                              pytest tests, the self-contained suite (self
                                     manual checks of the bridge (test_bridge_*.py)
 examples/                           client configuration and lineage.yaml templates
 docs/                               the documentation linked from the README
+  img/                              the README's lineage image and its Mermaid source
 CHANGELOG.md                        changes by version
-.github/workflows/                  CI (tests.yml) and the PyPI release (publish.yml)
+.github/
+  workflows/                        CI (tests.yml) and the PyPI release (publish.yml)
+  scripts/check_dist.py             checks what the wheel and the source archive carry
+  ISSUE_TEMPLATE/, pull_request_template.md, dependabot.yml
 ```
 
 ## Testing
@@ -59,16 +66,22 @@ CHANGELOG.md                        changes by version
 The tests build synthetic PBIP projects and report workspaces in temporary folders, among them a model written the way Power BI Desktop serializes it:
 
 ```bash
-pip install -e ".[dev]"    # from a clone: the package, editable, with pytest and ruff
-python -m pytest        # isolated tests + the self-contained suite
-ruff check .            # lint (real defects only, see pyproject.toml)
+pip install -e ".[dev]"     # from a clone: the package, editable, with pytest and ruff
+python -m pytest            # isolated tests + the self-contained suite
+ruff check .                # lint (real defects only, see pyproject.toml)
 ```
 
-The self-contained suite also runs on its own, with only the package installed: `python tests/self_test.py`. The tests never touch your description rules: they keep the settings folder and Documents in temporary folders.
+With uv: `uv run --extra dev pytest` and `uv run --extra dev ruff check .`, on the Python of `.python-version`.
 
-GitHub Actions runs lint and tests on every push and pull request, on Windows and Linux, with the oldest and the newest supported Python. A third job builds the package, checks what it carries and runs the installed command outside the repository (`.github/workflows/tests.yml`).
+The self-contained suite also runs on its own, with only the package installed: `python tests/self_test.py`. The tests never touch your own folder (your description rules and lineage configurations): they point the settings folder and Documents to temporary folders.
 
-Two manual scripts check the bridge against the real official executable (they are skipped or fail fast if it is not installed):
+GitHub Actions (`.github/workflows/tests.yml`) runs on every push and pull request:
+
+- lint, on Linux;
+- the tests on Windows and Linux, with the oldest and the newest supported Python (3.10 and 3.13);
+- a package job that builds the wheel and the source archive, checks what they carry (`.github/scripts/check_dist.py`) and runs the installed command outside the repository.
+
+Two manual scripts check the bridge against the real official executable, on Windows. pytest doesn't collect them; they are skipped or fail fast if the executable is not installed:
 
 ```bash
 python tests/test_bridge_write.py                              # synthetic throwaway project

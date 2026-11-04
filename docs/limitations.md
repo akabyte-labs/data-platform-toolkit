@@ -2,18 +2,18 @@
 
 [Back to the README](../README.md)
 
-> **Status:** the model and report tools come from a version used on a real Power BI project, where the end-to-end lineage was first built for one data warehouse. This version makes the lineage generic: any naming convention can be described in `lineage.yaml`. The generic engine is tested on synthetic projects, so other conventions may need tuning. Bug reports with an anonymized snippet are welcome.
+> **Status:** the lineage was first built for one real data warehouse and then made generic ([how it was built](../README.md#how-it-was-built)). The generic engine is tested on synthetic projects, so other naming conventions may need tuning. [Bug reports](https://github.com/akabyte-labs/data-platform-toolkit/issues/new/choose) with an anonymized snippet are welcome.
 
 ## Model and reports
 
-- Reports in the **PBIR-Legacy** format (`report.json` at the root of the `.Report` folder) are not analyzed: `find_measure_usage_in_reports` lists them as not analyzed, and fails if no report could be read. Upgrade them to PBIR.
+- Reports in the **PBIR-Legacy** format (`report.json` at the root of the `.Report` folder) are not analyzed: `find_measure_usage_in_reports` lists them as not analyzed, and fails if no report could be read. Open and save them in a recent Power BI Desktop, which converts them to PBIR.
 - Hierarchy levels used in a report are traced to their column only when the report's semantic model is available locally (`byPath` binding, or the `semantic_model` argument); otherwise they are flagged "to verify".
 - When an output exceeds `MCP_MAX_OUTPUT_CHARS`, the server **reduces the detail, not the list**: `get_dax_lineage` keeps the name of every measure and calculation item as long as the names alone fit the budget (on very large models it falls back to per-table counts, and says so), and `find_measure_usage_in_reports` always shows the usage count of every searched field. Tools whose output is already one line per element are cut instead, and the response then **starts** with `[!] INCOMPLETE RESPONSE`: narrow the request before concluding that something "doesn't exist" or "is not used".
 - The whole `definition` folder is read (tables, relationships, shared expressions, DAX functions, roles, perspectives), except `cultures/`: translations and linguistic metadata say nothing about how the model is computed, and only `get_translations` reads them. TMDL partial declarations are supported: a table split across files, several tables in one file. New measures go into the table's main file (the one named after it in `tables/`).
 - **Row-Level Security**: the tables a filter restricts are read from the relationships, as the engine propagates security: active relationships only, from the one side to the many side, and back only where the relationship sets `securityFilteringBehavior: bothDirections`. Role members are counted only when they are in the files (they are usually assigned in the Power BI service). RLS filters are read, never written.
 - **Translations** cover the captions, descriptions and display folders of tables, columns, measures and hierarchies; the translations of hierarchy levels and the linguistic metadata (Q&A synonyms) are not read.
 - The project search goes at most 6 folder levels below the given path, so a too generic path (the OneDrive root, a drive root) fails fast instead of scanning the whole disk. Point to the project, not to a folder far above it.
-- Power BI Desktop doesn't reload files changed outside it: close and reopen the project to see the changes.
+- Power BI Desktop doesn't see files changed outside it until you close and reopen the project. From the August 2026 release, the preview feature **Detect and reload external PBIP changes** offers to apply them without reopening ([Microsoft's guide](https://learn.microsoft.com/power-bi/developer/projects/projects-external-editing)). Save your changes in Power BI Desktop first: applying the external changes overwrites the unsaved ones.
 
 ## Lineage, database side
 
@@ -34,4 +34,4 @@
 
 ## Microsoft bridge
 
-The limits of the optional bridge (no DAX queries, refresh or transactions in folder mode, Windows only) are in [tools.md](tools.md#the-microsoft-bridge).
+The limits of the optional bridge (no DAX queries, refresh, traces or transactions in folder mode; the whole `definition` folder rewritten on every write; Windows only) are in [tools.md](tools.md#the-microsoft-bridge).

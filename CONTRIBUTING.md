@@ -40,7 +40,7 @@ The code lives in the `mcp_data_platform_toolkit` package; imports are absolute 
    - write tools must only be registered in full access mode;
    - a folder the server writes to is never chosen by the language model alone: it comes from the project paths (confined, see `project_paths`), from a fixed list, or from the user (a terminal command, an elicitation form).
 4. Add tests and make sure `python -m pytest` and `ruff check .` pass. New tests go in pytest files (`tests/test_*.py`), each building its own project with the fixtures of `tests/conftest.py`; `tests/self_test.py` is the older self-contained suite. CI runs everything on Windows and Linux with Python 3.10 and 3.13, so don't rely on the platform's line endings or on a specific Python version. If you change the bridge, also run `tests/test_bridge_write.py` with the official executable installed.
-5. Update the documentation in `docs/` if you add or change a tool or an option (`docs/tools.md`, `docs/configuration.md`; the README only when its first screen changes), and add an entry to `CHANGELOG.md` under "Unreleased".
+5. Update the documentation in `docs/` if you add or change a tool or an option (`docs/tools.md`, `docs/configuration.md`; the README only when its first screen changes), and add an entry to `CHANGELOG.md` under "Unreleased". The README is also the description on PyPI, so its links and images stay absolute (`https://github.com/akabyte-labs/data-platform-toolkit/blob/main/...`); the pages in `docs/` use relative links.
 6. Code, comments and messages are in English.
 
 ## Releasing
@@ -50,6 +50,6 @@ The code lives in the `mcp_data_platform_toolkit` package; imports are absolute 
 3. Tag the merge commit `v<version>` (e.g. `v1.5.0`) and push the tag: `.github/workflows/publish.yml` checks that the tag is the package version, builds the archives and publishes them to PyPI.
 4. Create the GitHub release from the tag, with the changelog entry as its text.
 
-Publishing uses PyPI's trusted publishing, so no token is stored in the repository. Once, before the first release: on PyPI, add a trusted publisher for the project `mcp-data-platform-toolkit` with this repository, the workflow `publish.yml` and the environment `pypi`; on GitHub, create the environment `pypi` (Settings → Environments).
+Publishing uses PyPI's trusted publishing, so no token is stored in the repository. It needs a one-time setup: on PyPI, a trusted publisher for the project `mcp-data-platform-toolkit` with this repository, the workflow `publish.yml` and the environment `pypi`; on GitHub, the environment `pypi` (Settings → Environments).
 
 By contributing, you agree that your contributions are licensed under the MIT License.

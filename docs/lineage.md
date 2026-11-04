@@ -4,7 +4,7 @@
 
 - [What the lineage follows](#what-the-lineage-follows)
 - [Example: where the number of a visual comes from](#example-where-the-number-of-a-visual-comes-from)
-- [Database lineage configuration](#database-lineage-configuration): [no structure yet](#when-the-project-has-no-structure-yet), [writing it](#writing-the-configuration), [drafts](#drafts)
+- [Database lineage configuration](#database-lineage-configuration): [no structure yet](#when-the-project-has-no-structure-yet), [files written by a pipeline](#files-written-by-a-pipeline), [writing it](#writing-the-configuration), [drafts](#drafts)
 - [Lineage tools](tools.md#lineage)
 
 ## What the lineage follows
@@ -28,7 +28,7 @@ The lineage can be exported as a Mermaid diagram, a Markdown page, CSV or JSON. 
 
 ## Example: where the number of a visual comes from
 
-The test suite builds a small synthetic project (`tests/test_end_to_end.py`): a database project with bronze, silver and gold layers, a semantic model and a report. Asked where the *Ratio* card gets its numbers from, the server follows it back to the files the data warehouse loads. This is the `export_lineage` Mermaid output (column level, upstream from `Shop/Overview/Ratio`), as GitHub draws it. The export runs left to right (`flowchart LR`); here the first line is changed to `flowchart TB` so the diagram fits the page:
+The test suite builds a small synthetic project (`tests/test_end_to_end.py`): a database project with bronze, silver and gold layers, a semantic model and a report. Asked where the *Ratio* card gets its numbers from, the server follows it back to the files the data warehouse loads. This is the `export_lineage` Mermaid output (column level, upstream from `Shop/Overview/Ratio`), as GitHub draws it. The export runs left to right (`flowchart LR`); here the first line is changed to `flowchart TB` so the diagram fits the page. A test (`tests/test_lineage_extras.py`) checks that this diagram, and the source of the README image (`docs/img/lineage-example.mmd`), are still the real export:
 
 ```mermaid
 flowchart TB
@@ -73,7 +73,7 @@ flowchart TB
   n12 -->|dax| n9
 ```
 
-The assistant reads the same chain as text (`get_end_to_end_lineage` on `[Total Sales]`, upstream; header shortened). Every edge says how it was found, with its file and line:
+The assistant reads the lineage as text. This is the `[Total Sales]` branch of the same chain (`get_end_to_end_lineage` on `[Total Sales]`, upstream; header shortened). Every edge says how it was found, with its file and line:
 
 ```text
 === END-TO-END LINEAGE: Shop (column level) ===
@@ -98,13 +98,7 @@ The lineage finds on its own everything the SQL states. A configuration file add
 - **Rules:** loads that no statement in the project shows. Each rule is a regular expression matching the loaded objects plus a template for their source; for example, every `curated.<entity>_history` table is loaded from `curated.<entity>`.
 - **Technical columns:** the columns the ETL creates.
 
-The server looks for the configuration in this order:
-
-1. `config_path`, when a tool is given one;
-2. the repository's `lineage.yaml` next to the `.sqlproj`, if the team committed one;
-3. yours: `projects\<repository>\<database project>.lineage.yaml` in [your folder](configuration.md#your-folder).
-
-Every lineage response says which file it used. Without any, the standard medallion applies: schemas `bronze`, `silver` and `gold`.
+There is one configuration per database project: yours, in [your folder](configuration.md#your-folder) outside the repository, or the team's `lineage.yaml` next to the `.sqlproj`, which wins ([which file is used](configuration.md#which-file-is-used)). Every lineage response says which file it used. Without any, the standard medallion applies: schemas `bronze`, `silver` and `gold`.
 
 ### When the project has no structure yet
 

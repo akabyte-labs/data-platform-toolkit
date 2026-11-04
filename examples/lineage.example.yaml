@@ -1,6 +1,8 @@
 # lineage.yaml: how a database project realizes the medallion architecture.
-# Copy it next to the .sqlproj, adapt it, then check it with test_lineage_config,
-# or let draft_lineage_config draft it from the project, asking what the SQL can't tell.
+# Paste it, adapted, into your own file ('mcp-data-platform-toolkit --lineage-config
+# <database project>' opens it, outside the repository) or, to share it with the team,
+# save it as 'lineage.yaml' next to the .sqlproj. Then check it with test_lineage_config.
+# Or let draft_lineage_config draft it from the project, asking what the SQL can't tell.
 # The full guide: lineage_config_guide.md (or the get_lineage_config_guide tool).
 
 version: 1
