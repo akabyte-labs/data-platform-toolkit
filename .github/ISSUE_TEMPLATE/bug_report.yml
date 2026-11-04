@@ -1,0 +1,35 @@
+name: Bug report
+description: Something the server does wrong or does not do as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never attach real customer models, credentials or connection strings.
+        For security problems, use the private report in the Security tab instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: check-output
+    attributes:
+      label: Output of --check
+      description: "`mcp-data-platform-toolkit --check` prints the server version, Python and dependencies."
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      placeholder: e.g. Claude Desktop, VS Code
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: A small, anonymized TMDL, PBIR or T-SQL snippet that shows the problem.
+      render: text
