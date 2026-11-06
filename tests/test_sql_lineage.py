@@ -274,6 +274,18 @@ def test_broken_duplicate_and_oversized_files_are_reported(write_files, tmp_path
     assert lineage.analysis.objects["dbo.a"].columns == ["x"]
 
 
+def test_names_are_read_in_linear_time():
+    """A long dotted name of bracketed parts with dots inside used to backtrack exponentially (ReDoS)."""
+    import time
+    name = ".".join(["[a.a]"] * 40)
+    start = time.perf_counter()
+    assert scanner.table_definition(f"CREATE TABLE {name} x") is None
+    assert scanner.module_header(f"CREATE PROC {name} x") == ("procedure", name)
+    assert time.perf_counter() - start < 1
+    assert scanner.table_definition("CREATE TABLE [dbo].[my.table] ([a] INT, \"b\" INT)") == (
+        "[dbo].[my.table]", ["a", "b"])
+
+
 def test_a_statement_after_go_has_its_own_line(write_files, tmp_path):
     """It used to get the line of the GO before it."""
     root = write_files({
