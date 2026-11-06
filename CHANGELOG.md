@@ -7,6 +7,20 @@ declares to MCP clients and the version of the package
 Versions before 1.5.0 were developed in a private repository: their history
 and tags are not part of this one.
 
+## 1.5.2
+
+A security fix in the SQL lineage. Upgrading is recommended for anyone who
+analyzes database projects they did not write.
+
+### Security
+
+- **SQL lineage**: reading the name of a `CREATE TABLE` or of a procedure,
+  function or trigger could take exponential time on a crafted name, such as
+  many bracketed parts with dots inside (`[a.a].[a.a]...`) not followed by
+  `(`: a `.sql` file in an analyzed project could hang the server (ReDoS,
+  CodeQL alert "Inefficient regular expression"). Each part of a name is
+  now read in only one way, in linear time; names are recognized as before.
+
 ## 1.5.1
 
 Mostly documentation: the description on PyPI will show what the README
