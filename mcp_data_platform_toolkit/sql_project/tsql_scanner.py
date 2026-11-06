@@ -33,13 +33,18 @@ _SQLCMD_RE = re.compile(r"^[ \t]*:[A-Za-z].*$", re.MULTILINE)
 _OPENROWSET_RE = re.compile(r"\bOPENROWSET\s*\(", re.IGNORECASE)
 _BULK_PATH_RE = re.compile(r"\bBULK\s+N?'((?:[^']|'')*)'", re.IGNORECASE)
 _WITH_RE = re.compile(r"\s*WITH\s*\(", re.IGNORECASE)
+# One part of a (possibly qualified) name: [bracketed], "quoted" or plain.
+# A plain part can't contain [, ] or ", so each part is read in only one way:
+# otherwise `[a.a]` is both one bracketed part and `[a` . `a]`, and a long
+# name that doesn't match backtracks exponentially (ReDoS).
+_NAME_PART = r"(?:\[[^\]]+\]|\"[^\"]+\"|[^\s.(\[\]\"]+)"
+_QUALIFIED_NAME = rf"{_NAME_PART}(?:\s*\.\s*{_NAME_PART})*"
 _MODULE_RE = re.compile(
     r"^\s*(?:CREATE\s+OR\s+ALTER|CREATE|ALTER)\s+(PROC(?:EDURE)?|FUNCTION|TRIGGER)\s+"
-    r"((?:\[[^\]]+\]|\"[^\"]+\"|[^\s.(]+)(?:\s*\.\s*(?:\[[^\]]+\]|\"[^\"]+\"|[^\s.(]+))*)",
+    rf"({_QUALIFIED_NAME})",
     re.IGNORECASE)
 _CREATE_TABLE_RE = re.compile(
-    r"^\s*CREATE\s+TABLE\s+"
-    r"((?:\[[^\]]+\]|\"[^\"]+\"|[^\s.(]+)(?:\s*\.\s*(?:\[[^\]]+\]|\"[^\"]+\"|[^\s.(]+))*)\s*\(",
+    rf"^\s*CREATE\s+TABLE\s+({_QUALIFIED_NAME})\s*\(",
     re.IGNORECASE)
 # Items of a table definition that are not columns.
 _TABLE_ITEMS = {"CONSTRAINT", "PRIMARY", "FOREIGN", "UNIQUE", "CHECK", "INDEX", "PERIOD"}
